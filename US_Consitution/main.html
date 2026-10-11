@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Philadelphia, 1787: You Are a Delegate!</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1d2b5a;--blue:#2f6df6;--red:#e5483b;--gold:#f5b82e;--paper:#f6f9ff;--ink:#16213f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:500 1.1rem/1.6 Nunito,system-ui,sans-serif}
+header{background:var(--navy);color:#fff;padding:1rem 1.2rem;border-bottom:6px solid var(--gold)}
+header h1{margin:0;font:700 1.5rem Fredoka,system-ui,sans-serif}
+header p{margin:.2rem 0 0;opacity:.85;font-size:.95rem}
+main{max-width:46rem;margin:0 auto;padding:1.2rem}
+#dots{display:flex;gap:.3rem;margin-bottom:1rem}
+#dots span{flex:1;height:.6rem;border-radius:1rem;background:#cfd8f3}
+#dots span.done{background:var(--blue)}
+.tag{display:inline-block;background:var(--gold);color:var(--navy);font-weight:700;border-radius:1rem;padding:.1rem .8rem;font-size:.9rem}
+h2{font:700 1.7rem/1.2 Fredoka,system-ui,sans-serif;margin:.6rem 0;color:var(--navy)}
+.card{background:#fff;border:3px solid var(--navy);border-radius:1rem;padding:1.2rem;box-shadow:5px 5px 0 var(--navy)}
+.choice{display:block;width:100%;text-align:left;font:700 1.05rem Nunito,system-ui,sans-serif;background:#fff;color:var(--navy);border:3px solid var(--blue);border-radius:.8rem;padding:.8rem 1rem;margin-top:.7rem;cursor:pointer}
+.choice:hover,.choice:focus-visible{background:var(--blue);color:#fff;outline:3px solid var(--gold)}
+.btn{font:700 1.1rem Fredoka,system-ui,sans-serif;background:var(--red);color:#fff;border:0;border-radius:2rem;padding:.7rem 1.6rem;margin-top:1rem;cursor:pointer}
+.btn:hover,.btn:focus-visible{background:var(--navy);outline:3px solid var(--gold)}
+.result{border-left:8px solid var(--gold);background:#fff8e2;padding:.8rem 1rem;border-radius:.6rem;margin-top:1rem}
+.term{font:inherit;color:var(--blue);background:none;border:0;border-bottom:2px dotted var(--blue);cursor:pointer;padding:0;font-weight:700}
+.term:hover,.term:focus-visible{background:#dfe9ff;outline:none}
+#pop{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);width:min(30rem,92vw);background:var(--navy);color:#fff;border-radius:1rem;padding:1rem 1.2rem;box-shadow:0 6px 24px #0006;display:none;z-index:9}
+#pop b{font:700 1.2rem Fredoka,system-ui,sans-serif;color:var(--gold)}
+#pop button{float:right;background:var(--gold);border:0;border-radius:1rem;font-weight:700;cursor:pointer;padding:.2rem .8rem}
+.pic{margin:0 0 .8rem;background:linear-gradient(#e4edff,#f6f9ff);border-radius:.8rem;border:2px solid #cfd8f3;padding:.4rem}
+.pic svg{display:block;width:100%;max-width:20rem;height:8.5rem;margin:0 auto}
+.pic .n{fill:var(--navy)}.pic .b{fill:var(--blue)}.pic .r{fill:var(--red)}.pic .g{fill:var(--gold)}.pic .w{fill:#fff}
+.pic .paper{fill:#fff;stroke:var(--navy);stroke-width:3}
+.pic .ns{stroke:var(--navy);stroke-width:5;stroke-linecap:round;fill:none}
+.pic .rs{stroke:var(--red);stroke-width:8;stroke-linecap:round;fill:none}
+.pic text{font-family:Fredoka,system-ui,sans-serif;font-weight:700;text-anchor:middle}
+.photo{margin:0 0 .8rem}
+.photo img{display:block;width:100%;max-height:18rem;object-fit:cover;border-radius:.8rem;border:3px solid var(--navy)}
+.photo figcaption{font-size:.85rem;opacity:.75;margin-top:.3rem}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .3s}@keyframes in{from{opacity:0}to{opacity:1}}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Philadelphia, 1787: You Are a Delegate!</h1>
+  <p>Click the <button class="term" style="color:#9fc0ff;border-color:#9fc0ff">blue dotted words</button> to learn what they mean.</p>
+</header>
+<main>
+  <div id="dots"></div>
+  <div id="game"></div>
+</main>
+<div id="pop" role="dialog" aria-live="polite"></div>
+
+<script>
+// ---------- WORD LIST (the pop-up glossary) ----------
+var words = {
+  "delegate": "A person chosen to speak and vote for a group. 55 delegates came to Philadelphia.",
+  "constitution": "The plan for how a government works. It lists the government's powers and its limits.",
+  "confederation": "A loose team of states. Each state mostly does its own thing.",
+  "tax": "Money people pay to the government. It pays for things like soldiers and roads.",
+  "executive": "The leader who makes sure laws are carried out. Today that is the president.",
+  "rebellion": "When people fight against their own government.",
+  "legislature": "The group that makes the laws. Our national one is Congress.",
+  "representation": "Having people who speak and vote for you in government.",
+  "population": "How many people live in a place.",
+  "compromise": "When each side gives up a little so everyone can agree.",
+  "enslaved": "Forced to work without pay or freedom. Enslaved people were treated as property, not citizens.",
+  "separation of powers": "Splitting government into three branches so one group can't do everything.",
+  "veto": "The president saying 'no' to a law Congress passed.",
+  "checks and balances": "Each branch can stop the others from getting too strong.",
+  "judicial": "Having to do with judges and courts.",
+  "federalism": "Sharing power between one national government and the state governments.",
+  "amendment": "A change or addition to the Constitution.",
+  "ratify": "To officially approve something. Nine states had to ratify the Constitution.",
+  "federalist": "Someone who wanted a strong national government and supported the Constitution.",
+  "anti-federalist": "Someone who feared the new government was too powerful and wanted rights written down.",
+  "bill of rights": "The first 10 amendments. They protect your freedoms, like free speech."
+};
+
+// ---------- THE STORY ----------
+// Each scene = one decision. Write [word] or [word|glossary key] to make a clickable word.
+var scenes = [
+ {tag:"Getting started", title:"Close the doors?",
+  text:"It's May 1787. You walk into the Pennsylvania State House. Fifty-five [delegate|delegate]s are here to fix the country. George Washington leads the meeting. Should the debates be secret?",
+  choices:[
+   {t:"Yes, keep the doors closed.", r:"Delegates did this! Secret talks meant people could change their minds without angry crowds yelling at them."},
+   {t:"No, let everyone listen.", r:"Some people wanted this. But the delegates voted for secrecy. Their rule: no sharing what was said outside the room."}]},
+ {tag:"Why the Articles failed", title:"The empty treasury",
+  text:"The country's first plan was the Articles of [Confederation|confederation]. Under it, Congress is broke and owes money to soldiers. Congress can't make states pay a [tax|tax]. It can only ask nicely. What do you do?",
+  choices:[
+   {t:"Keep asking the states nicely.", r:"That's what Congress did, and states often said no. Congress stayed broke."},
+   {t:"Give the national government power to collect taxes.", r:"Yes! The new Constitution gave Congress this power. It was a big fix."}]},
+ {tag:"Why the Articles failed", title:"A government with no leader",
+  text:"Under the Articles, there was no president and no national courts. Nobody was in charge of making sure laws were followed. What do you do?",
+  choices:[
+   {t:"Add a leader to carry out the laws.", r:"The delegates agreed! A leader is called the [executive|executive]. This became the president."},
+   {t:"Let each state decide what to enforce.", r:"That was the old way, and laws got ignored. The delegates wanted something stronger."}]},
+ {tag:"Why the Articles failed", title:"Trouble in Massachusetts",
+  text:"In 1786, farmers led by Daniel Shays shut down courts because they were losing their farms over debt. This was Shays' [Rebellion|rebellion]. Congress had no money for an army to stop it. What now?",
+  choices:[
+   {t:"Patch up the Articles with small changes.", r:"Some delegates tried this first. But they soon decided the Articles had too many problems."},
+   {t:"Throw out the Articles and write a new plan.", r:"That's what happened! Shays' Rebellion scared leaders and showed the country needed a stronger government."}]},
+ {tag:"The big debates", title:"Big states or small states?",
+  text:"Now you choose how states get a vote in Congress. Virginia says: more people = more votes. New Jersey says: every state gets one vote. Big states like the first plan. Small states like the second. Which do you pick?",
+  choices:[
+   {t:"The Virginia Plan: votes are based on population.", r:"Big states loved it. Small states were afraid they'd never win a vote."},
+   {t:"The New Jersey Plan: one vote for every state.", r:"Small states loved it. Big states said it wasn't fair to people in crowded states."}]},
+ {tag:"The big debates", title:"Find a middle path",
+  text:"Both sides are stuck. The meeting almost falls apart in the summer heat. Can you find a [compromise|compromise]?",
+  choices:[
+   {t:"Make two houses of Congress. One by population, one with 2 votes per state.", r:"Yes! This was the Great Compromise. The House has seats by population. The Senate gives each state 2 senators."},
+   {t:"Go home and stop meeting.", r:"Some delegates nearly did! But they stayed, and the Great Compromise saved the Convention."}]},
+ {tag:"The big debates", title:"The Three-Fifths Compromise",
+  text:"A hard question: how should [enslaved|enslaved] people be counted when deciding seats in the House? Enslaved people had no freedom and no vote. States that allowed slavery wanted them counted to get more seats. Other states said no. What do you choose?",
+  choices:[
+   {t:"Count every enslaved person as a full person.", r:"Slave states wanted this, because it gave them more power in Congress."},
+   {t:"Don't count enslaved people at all.", r:"Northern delegates wanted this, so slave states would have fewer seats."},
+   {t:"Count each as three-fifths of a person.", r:"This is what the delegates chose. It gave slave states extra power and protected slavery. Many people see this as one of the Constitution's biggest moral failures. Later amendments fixed it, and the 14th Amendment (1868) ended it."}]},
+ {tag:"Building the government", title:"Splitting up power",
+  text:"The delegates feared a king. You have to decide how to organize the government. What's your plan?",
+  choices:[
+   {t:"Put one group in charge of everything.", r:"The delegates said no. They had just fought a war against a king."},
+   {t:"Make three branches: one makes laws, one carries them out, one judges them.", r:"Yes! This is [separation of powers|separation of powers]: Congress, the President, and the courts."}]},
+ {tag:"Building the government", title:"One leader or three?",
+  text:"Some delegates feared one president would act like a king. They suggested a team of three leaders. What do you pick?",
+  choices:[
+   {t:"One president.", r:"The delegates picked this. One leader can act faster and is easier to hold responsible."},
+   {t:"A team of three leaders.", r:"The delegates thought three leaders might argue all day and not get anything done."}]},
+ {tag:"Building the government", title:"Stopping a bad law",
+  text:"Congress passes a law that is unfair. How can the president stop it? And how can Congress stop a president who says no too often?",
+  choices:[
+   {t:"The president can [veto|veto] a law. Congress can override it with a two-thirds vote.", r:"Yes! This is a check. Each branch can slow down the others."},
+   {t:"The president can never say no to Congress.", r:"The delegates wanted [checks and balances|checks and balances], so no one branch could win every time."}]},
+ {tag:"Building the government", title:"Who picks the judges?",
+  text:"Your plan needs [judicial|judicial] courts led by a Supreme Court. How should judges be chosen?",
+  choices:[
+   {t:"The president picks, and the Senate must approve.", r:"This is the real rule! Two branches share the job, which is another check."},
+   {t:"Judges choose themselves.", r:"The delegates thought this gave judges too much power. They wanted other branches to have a say."}]},
+ {tag:"Building the government", title:"Nation or state?",
+  text:"Who should make which choices? Printing money, running an army, and making treaties with other countries are big jobs. Schools and local police are smaller ones. How do you divide the jobs?",
+  choices:[
+   {t:"National government: money, army, treaties. States: schools and local laws.", r:"Yes! This is [federalism|federalism]. Power is shared between the nation and the states."},
+   {t:"Every state does everything alone.", r:"That was the old Articles way. It didn't work, so the delegates changed it."}]},
+ {tag:"Building the government", title:"Can we change it?",
+  text:"Times change. How hard should it be to change the Constitution with an [amendment|amendment]?",
+  choices:[
+   {t:"Hard, but possible.", r:"The delegates chose this! It takes two-thirds of Congress and three-fourths of the states. That protects the Constitution but lets it grow."},
+   {t:"Super easy. A simple majority can do it.", r:"The delegates worried this would make the rules change too often."}]},
+ {tag:"Ratification", title:"Convince your state",
+  text:"The Constitution is signed on September 17, 1787. Now the states must vote to [ratify|ratify] it. Nine of thirteen must say yes. You're talking to your neighbors. Which side do you join?",
+  choices:[
+   {t:"[Federalists|federalist]: we need a strong government, and the Constitution has good checks.", r:"Federalists like James Madison, Alexander Hamilton, and John Jay wrote essays called the Federalist Papers to persuade people."},
+   {t:"[Anti-Federalists|anti-federalist]: this gives too much power and doesn't protect our rights.", r:"Anti-Federalists like Patrick Henry and George Mason feared a government that was too strong. They wanted rights written down."}]},
+ {tag:"Ratification", title:"A big promise",
+  text:"Some states are on the fence. They'll only say yes if the Constitution protects people's freedoms. What do you do?",
+  choices:[
+   {t:"Promise to add a list of rights right after ratification.", r:"This worked! Several states ratified because of this promise. New Hampshire became the ninth state in June 1788."},
+   {t:"Refuse. The Constitution is perfect as it is.", r:"That might have stopped the Constitution. Many people wouldn't agree without a promise about rights."}]},
+ {tag:"The Bill of Rights", title:"Which freedom comes first?",
+  text:"It's 1789. James Madison writes the [Bill of Rights|bill of rights]. Which freedom would you put at the very top?",
+  choices:[
+   {t:"Speak, write, and practice religion freely.", r:"Correct! Freedom of speech, press, religion, assembly, and petition are in the First Amendment."},
+   {t:"A fair trial and protection from unfair searches.", r:"Those are in the Bill of Rights too, in the 4th through 8th Amendments."},
+   {t:"The right to keep and bear arms.", r:"That's the Second Amendment. It was added too. All 10 amendments were approved by the states in 1791."}]}
+];
+
+// ---------- PICTURES ----------
+// One drawing per decision, in the same order as the scenes. Each is [description for screen readers, drawing].
+var pics = {
+ door:["A closed door with a golden lock",'<rect class="n" x="55" y="8" width="50" height="78" rx="4"/><rect class="b" x="62" y="16" width="36" height="28" rx="2"/><rect class="b" x="62" y="50" width="36" height="28" rx="2"/><circle class="g" cx="95" cy="47" r="5"/>'],
+ coins:["An empty money bag with a red X",'<path class="g" d="M62 26q18-22 36 0q26 30-2 56H64Q36 56 62 26z"/><path class="n" d="M64 22h32l-6 12H70z"/><path class="rs" d="M64 44l32 30M96 44L64 74"/>'],
+ chair:["An empty chair with a question mark",'<rect class="n" x="52" y="10" width="10" height="52" rx="3"/><rect class="n" x="52" y="52" width="46" height="10" rx="3"/><rect class="n" x="52" y="62" width="9" height="22" rx="3"/><rect class="n" x="89" y="62" width="9" height="22" rx="3"/><text class="r" x="118" y="52" font-size="42">?</text>'],
+ pitchfork:["A pitchfork, a tool farmers used in Shays' Rebellion",'<path class="ns" d="M80 86V34M60 16v18q0 14 20 14t20-14V16M80 34V12" style="stroke-width:6"/><path class="g" d="M30 80q25-14 50 0t50 0v6H30z"/>'],
+ plans:["A big state with many people next to a small state with few people",'<rect class="b" x="14" y="14" width="76" height="64" rx="6"/><g class="w"><circle cx="32" cy="34" r="6"/><circle cx="52" cy="34" r="6"/><circle cx="72" cy="34" r="6"/><circle cx="32" cy="58" r="6"/><circle cx="52" cy="58" r="6"/><circle cx="72" cy="58" r="6"/></g><rect class="r" x="108" y="34" width="38" height="44" rx="6"/><g class="w"><circle cx="120" cy="52" r="5"/><circle cx="135" cy="52" r="5"/></g>'],
+ scales:["Balance scales, showing two sides finding a compromise",'<path class="ns" d="M80 14v64M52 80h56M32 28h96M32 28l-14 26M32 28l14 26M128 28l-14 26M128 28l14 26" style="stroke-width:4"/><path class="g" d="M16 54q16 22 32 0zM112 54q16 22 32 0z"/><circle class="r" cx="80" cy="12" r="6"/>'],
+ fifths:["Five boxes with three filled in, showing three-fifths",'<rect class="b" x="12" y="14" width="24" height="40" rx="3"/><rect class="b" x="42" y="14" width="24" height="40" rx="3"/><rect class="b" x="72" y="14" width="24" height="40" rx="3"/><rect class="paper" x="102" y="14" width="24" height="40" rx="3"/><rect class="paper" x="132" y="14" width="18" height="40" rx="3"/><text class="n" x="80" y="82" font-size="20">3/5</text>'],
+ columns:["A building with three columns for the three branches of government",'<path class="n" d="M18 34L80 8l62 26z"/><rect class="b" x="34" y="38" width="16" height="38"/><rect class="b" x="72" y="38" width="16" height="38"/><rect class="b" x="110" y="38" width="16" height="38"/><rect class="n" x="20" y="78" width="120" height="8" rx="2"/><circle class="g" cx="80" cy="26" r="5"/>'],
+ one:["One person standing tall as the president",'<circle class="b" cx="80" cy="28" r="14"/><path class="b" d="M50 86q0-34 30-34t30 34z"/><path class="g" d="M66 12l7 7 7-11 7 11 7-7-2 11H68z"/>'],
+ veto:["A red stop sign that says VETO",'<path class="r" d="M62 6h36l26 26v26L98 84H62L36 58V32z"/><path class="w" d="M64 12h32l22 22v22L96 78H64L42 56V34z" style="fill:none;stroke:#fff;stroke-width:3"/><text style="fill:#fff" x="80" y="55" font-size="26">VETO</text>'],
+ gavel:["A judge's gavel",'<g transform="rotate(35 80 42)"><rect class="n" x="50" y="10" width="60" height="26" rx="6"/><rect class="g" x="74" y="36" width="12" height="46" rx="4"/></g><rect class="b" x="30" y="76" width="64" height="10" rx="3"/>'],
+ states:["A big national square in the middle with small state squares around it",'<rect class="b" x="48" y="18" width="64" height="54" rx="8"/><text style="fill:#fff" x="80" y="52" font-size="22">USA</text><rect class="g" x="12" y="10" width="24" height="24" rx="4"/><rect class="g" x="12" y="56" width="24" height="24" rx="4"/><rect class="g" x="124" y="10" width="24" height="24" rx="4"/><rect class="g" x="124" y="56" width="24" height="24" rx="4"/>'],
+ amend:["A paper with a plus sign, showing a change to the Constitution",'<rect class="paper" x="40" y="8" width="64" height="76" rx="4"/><path class="ns" d="M52 26h40M52 40h40M52 54h24" style="stroke-width:4"/><circle class="g" cx="108" cy="64" r="18"/><path class="ns" d="M108 55v18M99 64h18"/>'],
+ ballot:["A paper going into a voting box",'<rect class="paper" x="62" y="6" width="36" height="46" rx="3" transform="rotate(-8 80 30)"/><path class="ns" d="M70 20h20M70 30h20" style="stroke-width:3"/><rect class="n" x="36" y="46" width="88" height="40" rx="5"/><rect class="g" x="62" y="54" width="36" height="6" rx="3"/>'],
+ scroll:["A scroll with a red seal, like a promise",'<rect class="paper" x="38" y="12" width="84" height="64" rx="4"/><circle class="g" cx="38" cy="44" r="10"/><circle class="g" cx="122" cy="44" r="10"/><path class="ns" d="M54 28h52M54 42h52M54 56h26" style="stroke-width:4"/><circle class="r" cx="102" cy="62" r="9"/>'],
+ star:["A gold star with the number 10, for the first ten amendments",'<path class="g" d="M80 4l13 28 30 3-22 21 6 30-27-15-27 15 6-30-22-21 30-3z"/><text class="n" x="80" y="60" font-size="26">10</text>']
+};
+var picOrder = ["door","coins","chair","pitchfork","plans","scales","fifths","columns","one","veto","gavel","states","amend","ballot","scroll","star"];
+
+// Real historical photos (optional). Put each file in an "images" folder in your repo.
+// The picture only shows up if the file exists. Change the credit to match where you found it!
+// Keys are decision numbers, starting at 0.
+var photos = {
+ 0:{src:"images/independence-hall.jpg", alt:"Independence Hall in Philadelphia, where the Convention met", credit:"Source: add where you found this image"},
+ 3:{src:"images/shays-rebellion.jpg", alt:"An old drawing of Shays' Rebellion in Massachusetts", credit:"Source: add where you found this image"},
+ 8:{src:"images/washington.jpg", alt:"A painting of George Washington", credit:"Source: add where you found this image"},
+ 13:{src:"images/signing-constitution.jpg", alt:"A painting of delegates signing the Constitution", credit:"Source: add where you found this image"},
+ 15:{src:"images/bill-of-rights.jpg", alt:"The original Bill of Rights document", credit:"Source: add where you found this image"}
+};
+
+function picHtml(i) {
+  var p = pics[picOrder[i]];
+  var out = '<figure class="pic" role="img" aria-label="' + p[0] + '"><svg viewBox="0 0 160 90" aria-hidden="true">' + p[1] + '</svg></figure>';
+  var ph = photos[i];
+  if (ph) out += '<figure class="photo"><img src="' + ph.src + '" alt="' + ph.alt + '" onerror="this.parentNode.style.display=\'none\'"><figcaption>' + ph.credit + '</figcaption></figure>';
+  return out;
+}
+
+// ---------- THE GAME ENGINE (kept simple) ----------
+var game = document.getElementById("game");
+var dots = document.getElementById("dots");
+var pop = document.getElementById("pop");
+var step = 0;
+
+// turns [word|key] into a clickable button
+function addTerms(text) {
+  return text.replace(/\[([^\]|]+)\|?([^\]]*)\]/g, function (m, label, key) {
+    key = (key || label).toLowerCase();
+    return '<button class="term" data-key="' + key + '">' + label + '</button>';
+  });
+}
+
+function drawDots() {
+  dots.innerHTML = scenes.map(function (s, i) {
+    return '<span class="' + (i < step ? "done" : "") + '"></span>';
+  }).join("");
+}
+
+function showScene() {
+  if (step >= scenes.length) return showEnd();
+  var s = scenes[step];
+  drawDots();
+  var html = '<div class="card">' + picHtml(step) + '<span class="tag">' + s.tag + '</span>' +
+    '<h2>Decision ' + (step + 1) + ' of ' + scenes.length + ': ' + s.title + '</h2>' +
+    '<p>' + addTerms(s.text) + '</p>';
+  s.choices.forEach(function (c, i) {
+    html += '<button class="choice" data-i="' + i + '">' + c.t + '</button>';
+  });
+  game.innerHTML = html + '</div>';
+}
+
+function showResult(i) {
+  var c = scenes[step].choices[i];
+  var card = game.querySelector(".card");
+  card.innerHTML += '<div class="result"><b>What really happened:</b> ' + addTerms(c.r) + '</div>' +
+    '<button class="btn" id="next">' + (step + 1 === scenes.length ? "Finish" : "Next decision") + '</button>';
+  card.querySelectorAll(".choice").forEach(function (b) { b.disabled = true; b.style.opacity = ".5"; });
+  document.getElementById("next").focus();
+}
+
+function showEnd() {
+  step = scenes.length; drawDots();
+  game.innerHTML = '<div class="card"><figure class="pic" role="img" aria-label="' + pics.star[0] + '"><svg viewBox="0 0 160 90" aria-hidden="true">' + pics.star[1] + '</svg></figure><h2>You helped build the Constitution!</h2>' +
+    '<p>' + addTerms("You fixed what broke under the Articles, found compromises, split up power, and helped win ratification. The Constitution was not perfect, and people have used the [amendment|amendment] process to improve it ever since. Now it is your turn to join the conversation.") + '</p>' +
+    '<button class="btn" id="again">Play again</button></div>';
+}
+
+// ---------- CLICKS ----------
+document.addEventListener("click", function (e) {
+  var t = e.target;
+  if (t.classList.contains("choice")) showResult(+t.dataset.i);
+  else if (t.id === "next") { step++; showScene(); window.scrollTo(0, 0); }
+  else if (t.id === "again") { step = 0; showScene(); }
+  else if (t.classList.contains("term")) {
+    var key = t.dataset.key;
+    if (!key) return;
+    pop.innerHTML = '<button id="close">Close</button><b>' + key + '</b><br>' + (words[key] || "");
+    pop.style.display = "block";
+  } else if (t.id === "close") pop.style.display = "none";
+});
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") pop.style.display = "none"; });
+
+showScene();
+</script>
+</body>
+</html>
